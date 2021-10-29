@@ -101,25 +101,21 @@ export default function SignInSide() {
       return;
     } else setShowNotFilledMessage(false);
     setLoading(true);
-    // try {
-    //   const res = await axios.post("/auth/login", user);
-    //   if (
-    //     res.data.message.message === "Incorrect email or password 1." ||
-    //     res.data.message.message === "Incorrect email or password 2."
-    //   ) {
-    //     setLoading(false);
-    //     setShowMessage(true);
-    //   } else {
-    //     console.log(res.data.user);
-    //     dispatch(authActions.logIn(res.data));
-    //     localStorage.setItem("token", res.data.token);
-    //     localStorage.setItem("userId", res.data.user._id);
-    //     history.push("/dashboard");
-    //   }
-    // } catch (e) {
-    //   setLoading(false);
-    //   console.log(e);
-    // }
+    try {
+      const res = await axios.post("/login", user);
+      console.log(res.data);
+      if (res.data === "Incorrect Credentials") {
+        setLoading(false);
+        setShowMessage(true);
+      } else {
+        console.log(res.data);
+        localStorage.setItem("userId", res.data._id);
+        history.push("/dashboard");
+      }
+    } catch (e) {
+      setLoading(false);
+      console.log(e);
+    }
   };
 
   return (
