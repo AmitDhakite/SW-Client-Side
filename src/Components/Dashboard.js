@@ -90,6 +90,9 @@ export default function SignInSide() {
             >
               Add New Task
             </Button>
+            {tasks?.length === 0 && (
+              <h2>No tasks added, please add some new tasks...</h2>
+            )}
             <Paper>
               {tasks?.map((c) => (
                 <Card
