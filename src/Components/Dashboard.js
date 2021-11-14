@@ -13,6 +13,7 @@ import classes from "bootstrap/dist/css/bootstrap.min.css";
 import Card from "./layout/Card";
 import axios from "../axios.js";
 import { useHistory } from "react-router-dom";
+import { TableSortLabel } from "@material-ui/core";
 
 export default function SignInSide() {
   const [addTask, setAddTask] = useState(false);
@@ -26,12 +27,17 @@ export default function SignInSide() {
     userId: localStorage.getItem("userId"),
   });
 
+  function compareNumbers(a, b) {
+    return b.importance - a.importance;
+  }
+
   useEffect(async () => {
     try {
       const res = await axios.post("/getTasks", {
         id: localStorage.getItem("userId"),
       });
-      setTasks(res.data);
+      res.data.sort(compareNumbers);
+      setTasks(res.data.sort(compareNumbers));
       console.log(res.data);
     } catch (error) {
       console.log(error);
@@ -53,6 +59,11 @@ export default function SignInSide() {
     try {
       const res = await axios.post("/addTask", task);
       setTasks((p) => [res.data, ...p]);
+      setTasks((p) => {
+        const k = p;
+        k.sort(compareNumbers);
+        return k;
+      });
       setAddTask(false);
     } catch (e) {
       console.log(e);
@@ -62,6 +73,19 @@ export default function SignInSide() {
   const logout = () => {
     localStorage.clear();
     history.push("/");
+  };
+
+  const del = async (id) => {
+    try {
+      const res = await axios.post("/deleteTask", {
+        id,
+        userId: localStorage.getItem("userId"),
+      });
+      setTasks(res.data.sort(compareNumbers));
+    } catch (error) {
+      console.log(error);
+    }
+    console.log(id);
   };
 
   return (
@@ -83,6 +107,9 @@ export default function SignInSide() {
           <>
             {" "}
             <Button
+              class="addMore"
+              name="addMore"
+              id="addMore"
               style={{ marginBottom: "30px" }}
               onClick={() => {
                 setAddTask(true);
@@ -96,10 +123,14 @@ export default function SignInSide() {
             <Paper>
               {tasks?.map((c) => (
                 <Card
+                  del={(id) => {
+                    del(id);
+                  }}
                   name={c.name}
                   details={c.details}
                   date={c.date}
                   imp={c.importance}
+                  _id={c._id}
                 />
               ))}
             </Paper>
